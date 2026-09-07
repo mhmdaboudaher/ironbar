@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRONBAR — Calisthenics Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15140F;
+    --panel:#1D1C15;
+    --panel2:#252319;
+    --chalk:#F3EFE4;
+    --steel:#9C9A88;
+    --rust:#D2491C;
+    --rust-dim:#8A3213;
+    --line:rgba(243,239,228,0.10);
+    --line-strong:rgba(243,239,228,0.20);
+    --danger:#E24B4A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--ink);
+    color:var(--chalk);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  .display{font-family:'Archivo Black',sans-serif;letter-spacing:-0.01em;}
+  header{
+    padding:20px 20px 16px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+  }
+  header .logo{font-size:20px;}
+  header .logo span{color:var(--rust);}
+  header .tag{font-size:11px;color:var(--steel);text-transform:uppercase;letter-spacing:0.08em;}
+  main{flex:1;padding:20px;padding-bottom:90px;max-width:520px;width:100%;margin:0 auto;}
+  section{display:none;}
+  section.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+  nav.tabs{
+    position:sticky;
+    bottom:0;
+    display:flex;
+    border-top:1px solid var(--line);
+    background:var(--ink);
+    z-index:10;
+  }
+  nav.tabs button{
+    flex:1;
+    background:none;
+    border:none;
+    color:var(--steel);
+    font-family:'Inter',sans-serif;
+    font-size:10px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    padding:12px 4px 14px;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+  }
+  nav.tabs button.on{color:var(--chalk);}
+  nav.tabs button .tab-icon{font-size:16px;color:var(--steel);}
+  nav.tabs button.on .tab-icon{color:var(--rust);}
+  @keyframes badgePop{
+    0%{transform:scale(0.4);opacity:0;}
+    60%{transform:scale(1.15);opacity:1;}
+    100%{transform:scale(1);opacity:1;}
+  }
+  .badge-new{animation:badgePop .5s ease;}
+
+  /* Move demo animations — simple stick figures showing motion */
+  .move-demo{width:100%;height:120px;background:var(--panel2);border:1px solid var(--line);border-radius:2px;margin-bottom:12px;}
+  .move-demo svg{width:100%;height:100%;}
+  .fig-line{stroke:var(--chalk);stroke-width:8;stroke-linecap:round;stroke-linejoin:round;fill:none;}
+  .fig-head{fill:var(--chalk);}
+  .fig-bar{stroke:var(--rust);stroke-width:5;stroke-linecap:round;}
+  .fig-finger{stroke:var(--chalk);stroke-width:2.5;stroke-linecap:round;}
+
+  @keyframes handstandWobble{
+    0%,100%{transform:rotate(-2deg);}
+    50%{transform:rotate(2deg);}
+  }
+  .anim-handstand .fig-group{transform-origin:60px 100px;animation:handstandWobble 2.2s ease-in-out infinite;}
+
+  @keyframes leverSettle{
+    0%{transform:translateY(-6px);}
+    50%{transform:translateY(2px);}
+    100%{transform:translateY(-6px);}
+  }
+  .anim-lever .fig-group{transform-origin:60px 30px;animation:leverSettle 2.4s ease-in-out infinite;}
+
+  @keyframes plancheLift{
+    0%{transform:translateY(4px);}
+    50%{transform:translateY(-3px);}
+    100%{transform:translateY(4px);}
+  }
+  .anim-planche .fig-group{transform-origin:60px 90px;animation:plancheLift 2.2s ease-in-out infinite;}
+
+  @keyframes flagSway{
+    0%,100%{transform:rotate(-3deg);}
+    50%{transform:rotate(3deg);}
+  }
+  .anim-flag .fig-group{transform-origin:30px 60px;animation:flagSway 2.6s ease-in-out infinite;}
+
+  @keyframes muscleupCycle{
+    0%{transform:translateY(20px);}
+    25%{transform:translateY(20px);}
+    50%{transform:translateY(-5px);}
+    75%{transform:translateY(-15px);}
+    100%{transform:translateY(20px);}
+  }
+  .anim-muscleup .fig-group{transform-origin:60px 30px;animation:muscleupCycle 2.8s ease-in-out infinite;}
+
+  h1.page-title{font-size:26px;line-height:1.15;margin-bottom:4px;}
+  p.page-sub{font-size:13px;color:var(--steel);margin-bottom:24px;}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:18px;
+    margin-bottom:12px;
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .stat-label{font-size:11px;color:var(--steel);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+  .stat-value{font-size:26px;font-family:'Archivo Black',sans-serif;}
+  .stat-value small{font-size:13px;color:var(--steel);font-family:'Inter',sans-serif;font-weight:500;}
+
+  .row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
+  .row:last-child{border-bottom:none;}
+  .row .name{font-size:14px;font-weight:500;}
+  .row .meta{font-size:12px;color:var(--steel);margin-top:2px;}
+  .row .val{font-size:15px;font-family:'Archivo Black',sans-serif;color:var(--rust);}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--rust);color:var(--chalk);border:none;
+    font-family:'Inter',sans-serif;font-size:13px;font-weight:600;
+    letter-spacing:0.02em;text-transform:uppercase;
+    padding:13px 18px;border-radius:2px;cursor:pointer;width:100%;
+  }
+  .btn.ghost{background:transparent;border:1px solid var(--line-strong);color:var(--chalk);}
+  .btn.small{width:auto;padding:8px 14px;font-size:11px;}
+
+  input, select{
+    width:100%;background:var(--panel2);border:1px solid var(--line-strong);
+    color:var(--chalk);padding:12px;font-family:'Inter',sans-serif;font-size:14px;
+    border-radius:2px;margin-bottom:12px;
+  }
+  label.field-label{font-size:11px;color:var(--steel);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px;}
+
+  .section-label{font-size:11px;color:var(--rust);text-transform:uppercase;letter-spacing:0.1em;margin:22px 0 10px;}
+  .section-label:first-child{margin-top:0;}
+
+  /* Onboarding */
+  #onboard{display:flex;flex-direction:column;justify-content:center;min-height:70vh;}
+  #onboard h1{font-size:34px;line-height:1.1;margin-bottom:10px;}
+  #onboard p{color:var(--steel);font-size:14px;margin-bottom:28px;}
+  .opt-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+  .opt{
+    background:var(--panel);border:1px solid var(--line-strong);color:var(--chalk);
+    padding:14px 16px;text-align:left;border-radius:2px;font-size:14px;font-family:'Inter',sans-serif;cursor:pointer;
+  }
+  .opt.selected{border-color:var(--rust);background:var(--panel2);}
+  .err{color:var(--danger);font-size:12px;margin:-8px 0 12px;display:none;}
+
+  /* Timer */
+  .timer-face{
+    text-align:center;padding:40px 0 30px;
+  }
+  .timer-num{font-family:'Archivo Black',sans-serif;font-size:64px;color:var(--chalk);}
+  .timer-move{font-size:13px;color:var(--steel);text-transform:uppercase;letter-spacing:0.08em;margin-top:6px;}
+  .timer-controls{display:flex;gap:10px;}
+
+  .move-chip{
+    display:inline-block;background:var(--panel2);border:1px solid var(--line-strong);
+    padding:8px 12px;border-radius:2px;font-size:13px;margin:0 8px 8px 0;cursor:pointer;
+  }
+  .move-chip.on{border-color:var(--rust);color:var(--rust);}
+
+  .log-item{padding:12px 0;border-bottom:1px solid var(--line);}
+  .log-item .top{display:flex;justify-content:space-between;font-size:14px;font-weight:500;}
+  .log-item .date{font-size:11px;color:var(--steel);margin-top:2px;}
+  .empty{color:var(--steel);font-size:13px;text-align:center;padding:30px 0;}
+
+  .lib-item{border-bottom:1px solid var(--line);padding:14px 0;}
+  .lib-item .name{font-size:14px;font-weight:600;}
+  .lib-item .desc{font-size:12px;color:var(--steel);margin-top:4px;line-height:1.5;}
+  .lib-item .tag{display:inline-block;font-size:10px;color:var(--rust);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
+</style>
+</head>
+<body>
+
+<div id="authWrap" style="display:none;">
+  <div style="padding:20px;max-width:480px;margin:0 auto;">
+    <div style="display:flex;flex-direction:column;justify-content:center;min-height:70vh;">
+      <div style="color:var(--rust);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">Account</div>
+      <h1 class="display" style="font-size:34px;line-height:1.1;margin-bottom:10px;">Sign in to IronBar.</h1>
+      <p style="color:var(--steel);font-size:14px;margin-bottom:28px;" id="auth-sub">Your data syncs securely to your account.</p>
+
+      <label class="field-label">Email</label>
+      <input id="auth-email" type="email" placeholder="you@email.com" autocapitalize="off" autocorrect="off" spellcheck="false" />
+
+      <label class="field-label">Password</label>
+      <div style="position:relative;">
+        <input id="auth-password" type="password" placeholder="At least 6 characters" autocapitalize="off" autocorrect="off" spellcheck="false" style="padding-right:70px;" />
+        <button type="button" id="toggle-pw-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--steel);font-size:11px;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;padding:4px;">Show</button>
+      </div>
+
+      <div class="err" id="auth-error" style="margin-bottom:14px;"></div>
+
+      <button class="btn" id="auth-login-btn" style="margin-bottom:10px;">Log in</button>
+      <button class="btn ghost" id="auth-signup-btn">Create account</button>
+    </div>
+  </div>
+</div>
+
+<div id="onboardWrap" style="display:none;">
+  <div style="padding:20px;max-width:480px;margin:0 auto;">
+    <div id="onboard">
+      <div class="tag" style="color:var(--rust);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">Athlete setup</div>
+      <h1 class="display">Build your bar.</h1>
+      <p>A few questions, then your training plan is ready.</p>
+
+      <label class="field-label">Your name</label>
+      <input id="ob-name" placeholder="Mhamad Abou Daher" />
+      <div class="err" id="err-name">Enter your name first</div>
+
+      <label class="field-label">Focus discipline</label>
+      <div class="opt-grid" id="ob-focus">
+        <button class="opt" data-v="Freestyle">Freestyle — elements and flow</button>
+        <button class="opt" data-v="Power">Power — weighted pull-up / dip</button>
+        <button class="opt" data-v="Endurance">Endurance — reps and stamina</button>
+      </div>
+      <div class="err" id="err-focus">Pick a discipline</div>
+
+      <label class="field-label">Training experience</label>
+      <div class="opt-grid" id="ob-exp">
+        <button class="opt" data-v="Under 1 year">Under 1 year</button>
+        <button class="opt" data-v="1-2 years">1–2 years</button>
+        <button class="opt" data-v="3+ years">3+ years</button>
+      </div>
+      <div class="err" id="err-exp">Pick your experience level</div>
+
+      <button class="btn" id="ob-submit">Start training</button>
+    </div>
+  </div>
+</div>
+
+<div id="appWrap" style="display:none;">
+  <header>
+    <div class="logo display">IRON<span>BAR</span></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button id="lang-toggle-btn" style="background:none;border:1px solid var(--line-strong);color:var(--chalk);font-size:10px;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;padding:4px 8px;border-radius:2px;">EN / عربي</button>
+      <div class="tag" id="hdr-name">—</div>
+      <button id="signout-btn" style="background:none;border:none;color:var(--steel);font-size:10px;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;padding:0;">Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="tab-home">
+      <h1 class="page-title" data-i18n="home_title">Today's session</h1>
+      <p class="page-sub" id="home-sub">—</p>
+
+      <div id="reminder-banner" class="card" style="display:none;border-color:var(--rust);"></div>
+
+      <div class="grid2" style="margin-bottom:20px;">
+        <div class="card"><div class="stat-label" data-i18n="streak">Streak</div><div class="stat-value" id="stat-streak">0<small data-i18n="days"> days</small></div></div>
+        <div class="card"><div class="stat-label" data-i18n="sessions_logged">Sessions logged</div><div class="stat-value" id="stat-count">0</div></div>
+      </div>
+
+      <div class="section-label" data-i18n="best_holds">Best holds</div>
+      <div class="card" id="best-holds"></div>
+
+      <div class="section-label" data-i18n="badges">Badges</div>
+      <div class="card" id="badges-list"></div>
+
+      <div class="section-label" data-i18n="plan_today">Plan for today</div>
+      <div class="card" id="today-plan"></div>
+    </section>
+
+    <section id="tab-plan">
+      <h1 class="page-title" data-i18n="plan_title">Weekly plan</h1>
+      <p class="page-sub" data-i18n="plan_sub">Built from your focus and experience.</p>
+      <div class="card" id="plan-list"></div>
+    </section>
+
+    <section id="tab-timer">
+      <h1 class="page-title" data-i18n="timer_title">Hold timer</h1>
+      <p class="page-sub" data-i18n="timer_sub">Pick a move, then start.</p>
+      <div id="timer-moves"></div>
+      <div class="card">
+        <div class="timer-face">
+          <div class="timer-num" id="timer-display">00:00</div>
+          <div class="timer-move" id="timer-move-label" data-i18n="select_move">Select a move above</div>
+        </div>
+        <div class="timer-controls">
+          <button class="btn" id="timer-start" data-i18n="start">Start</button>
+          <button class="btn ghost" id="timer-reset" data-i18n="reset">Reset</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-log">
+      <h1 class="page-title" data-i18n="log_title">Progress log</h1>
+      <p class="page-sub" data-i18n="log_sub">Every hold you save shows up here.</p>
+
+      <div class="card">
+        <div class="stat-label" style="margin-bottom:10px;" data-i18n="progress_chart">Progress chart</div>
+        <select id="chart-move-select"></select>
+        <canvas id="progress-chart" width="480" height="180" style="width:100%;height:180px;"></canvas>
+        <div id="chart-empty" class="empty" style="display:none;" data-i18n="chart_empty">No sessions logged for this move yet.</div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <button class="btn ghost" id="export-btn" data-i18n="export_btn">Export stats card (PNG)</button>
+      </div>
+
+      <div id="log-list"></div>
+    </section>
+
+    <section id="tab-library">
+      <h1 class="page-title" data-i18n="library_title">Move library</h1>
+      <p class="page-sub" data-i18n="library_sub">Progression paths for core static skills.</p>
+      <div id="lib-list"></div>
+    </section>
+  </main>
+
+  <nav class="tabs">
+    <button data-tab="home" class="on"><span class="tab-icon">⌂</span><span data-i18n="nav_home">Home</span></button>
+    <button data-tab="plan"><span class="tab-icon">▤</span><span data-i18n="nav_plan">Plan</span></button>
+    <button data-tab="timer"><span class="tab-icon">◔</span><span data-i18n="nav_timer">Timer</span></button>
+    <button data-tab="log"><span class="tab-icon">↗</span><span data-i18n="nav_log">Log</span></button>
+    <button data-tab="library"><span class="tab-icon">▣</span><span data-i18n="nav_library">Library</span></button>
+  </nav>
+</div>
+
+<script type="module">
+let profile = null;
+let logs = [];
+
+let currentLang = localStorage.getItem('ironbar_lang') || 'en';
+
+const TRANSLATIONS = {
+  home_title:      { en: "Today's session", ar: "جلسة اليوم" },
+  streak:          { en: "Streak", ar: "أيام متتالية" },
+  days:            { en: " days", ar: " يوم" },
+  sessions_logged: { en: "Sessions logged", ar: "عدد الجلسات" },
+  best_holds:      { en: "Best holds", ar: "أفضل أرقامك" },
+  badges:          { en: "Badges", ar: "الميداليات" },
+  plan_today:      { en: "Plan for today", ar: "خطة اليوم" },
+  plan_title:      { en: "Weekly plan", ar: "الخطة الأسبوعية" },
+  plan_sub:        { en: "Built from your focus and experience.", ar: "مبنية حسب اختصاصك ومستواك." },
+  timer_title:     { en: "Hold timer", ar: "تايمر الهولد" },
+  timer_sub:       { en: "Pick a move, then start.", ar: "اختار حركة، وابلش." },
+  select_move:     { en: "Select a move above", ar: "اختار حركة فوق" },
+  start:           { en: "Start", ar: "ابلش" },
+  reset:           { en: "Reset", ar: "تصفير" },
+  log_title:       { en: "Progress log", ar: "سجل التقدم" },
+  log_sub:         { en: "Every hold you save shows up here.", ar: "كل هولد بتسجلو بيطلع هون." },
+  progress_chart:  { en: "Progress chart", ar: "رسم التقدم" },
+  chart_empty:     { en: "No sessions logged for this move yet.", ar: "ما في جلسات مسجلة لهالحركة بعد." },
+  export_btn:      { en: "Export stats card (PNG)", ar: "تصدير بطاقة الإحصائيات (PNG)" },
+  library_title:   { en: "Move library", ar: "مكتبة الحركات" },
+  library_sub:     { en: "Progression paths for core static skills.", ar: "مسار التقدم لأهم حركات الثبات." },
+  nav_home:        { en: "Home", ar: "الرئيسية" },
+  nav_plan:        { en: "Plan", ar: "الخطة" },
+  nav_timer:       { en: "Timer", ar: "التايمر" },
+  nav_log:         { en: "Log", ar: "السجل" },
+  nav_library:     { en: "Library", ar: "المكتبة" },
+};
+
+function applyLanguage(lang){
+  currentLang = lang;
+  localStorage.setItem('ironbar_lang', lang);
+  document.documentElement.setAttribute('lang', lang);
+  document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(TRANSLATIONS[key]) el.textContent = TRANSLATIONS[key][lang];
+  });
+  // Re-render dynamic sections that build their own text (move names stay in English —
+  // they're the same internationally, so lifters and judges everywhere recognize them).
+  if(profile){
+    renderHome();
+    renderPlan();
+    renderLog();
+    renderLibrary();
+  }
+}
+
+document.getElementById('lang-toggle-btn').addEventListener('click', ()=>{
+  applyLanguage(currentLang === 'en' ? 'ar' : 'en');
+});
+
+const MOVES = ["Handstand", "Tuck Front Lever", "Advanced Tuck Front Lever", "Straddle Front Lever", "Full Front Lever", "Tuck Planche", "Advanced Tuck Planche", "Straddle Planche", "Full Planche", "Human Flag"];
+
+// Difficulty-adjusted badge thresholds (seconds).
+// Harder moves reach the same badge tier at a lower hold time.
+const BADGE_THRESHOLDS = {
+  "Handstand":                    { bronze: 15, silver: 30, gold: 60 },
+  "Tuck Front Lever":             { bronze: 5,  silver: 15, gold: 30 },
+  "Advanced Tuck Front Lever":    { bronze: 5,  silver: 12, gold: 25 },
+  "Straddle Front Lever":         { bronze: 3,  silver: 10, gold: 20 },
+  "Full Front Lever":             { bronze: 3,  silver: 8,  gold: 15 },
+  "Tuck Planche":                 { bronze: 5,  silver: 15, gold: 30 },
+  "Advanced Tuck Planche":        { bronze: 5,  silver: 12, gold: 25 },
+  "Straddle Planche":             { bronze: 3,  silver: 10, gold: 20 },
+  "Full Planche":                 { bronze: 3,  silver: 8,  gold: 15 },
+  "Human Flag":                   { bronze: 3,  silver: 8,  gold: 15 },
+};
+
+function getBadge(move, seconds){
+  const t = BADGE_THRESHOLDS[move];
+  if(!t) return null;
+  if(seconds >= t.gold) return "Gold";
+  if(seconds >= t.silver) return "Silver";
+  if(seconds >= t.bronze) return "Bronze";
+  return null;
+}
+
+const PLANS = {
+  "Freestyle": [
+    {day:"Mon", focus:{en:"Static elements", ar:"عناصر ثابتة"}, items:{en:["Planche hold work", "Front Lever hold work", "Handstand practice"], ar:["تمرين هولد Planche", "تمرين هولد Front Lever", "تمرين Handstand"]}},
+    {day:"Wed", focus:{en:"Dynamic transitions", ar:"انتقالات ديناميك"}, items:{en:["Bar-to-bar swings", "Kip to support drills", "Basic combo linking"], ar:["أرجحة من بار لبار", "تمارين Kip للدعم", "ربط كومبو بسيط"]}},
+    {day:"Fri", focus:{en:"Flow routine", ar:"روتين فلو"}, items:{en:["Link 3 static elements", "Add one transition", "Full routine run-through"], ar:["اربط ٣ عناصر ثابتة", "ضيف انتقالة وحدة", "جرب الروتين كامل"]}},
+  ],
+  "Power": [
+    {day:"Mon", focus:{en:"Planche progression", ar:"تدرّج Planche"}, items:{en:["Tuck planche holds", "Planche lean push-ups", "Straddle planche attempts"], ar:["هولد Tuck Planche", "ضغط مائل لـPlanche", "محاولات Straddle Planche"]}},
+    {day:"Wed", focus:{en:"Front Lever progression", ar:"تدرّج Front Lever"}, items:{en:["Tuck front lever holds", "Front lever rows", "Straddle front lever"], ar:["هولد Tuck Front Lever", "سحب Front Lever", "Straddle Front Lever"]}},
+    {day:"Fri", focus:{en:"Handstand strength", ar:"قوة Handstand"}, items:{en:["Wall handstand hold", "Handstand push-up negatives", "Freestanding practice"], ar:["هولد Handstand عالحيط", "نزول ضغط Handstand", "تمرين توازن حر"]}},
+  ],
+  "Endurance": [
+    {day:"Mon", focus:{en:"Pull volume", ar:"حجم سحب"}, items:{en:["5 sets max pull-ups", "Dead hang holds", "Australian pull-up burnout"], ar:["٥ سيتات Pull-up لأقصى حد", "هولد تعليق كامل", "إنهاك Australian Pull-up"]}},
+    {day:"Wed", focus:{en:"Push volume", ar:"حجم دفع"}, items:{en:["5 sets max dips", "Push-up ladders", "Plank hold series"], ar:["٥ سيتات Dips لأقصى حد", "سلم Push-up", "سلسلة هولد بلانك"]}},
+    {day:"Fri", focus:{en:"Mixed circuit", ar:"سيركت مختلط"}, items:{en:["Pull-up / dip superset", "Core circuit", "Timed AMRAP finisher"], ar:["سوبرسيت Pull-up/Dip", "سيركت كور", "AMRAP بوقت محدد"]}},
+  ]
+};
+
+const REST_TIPS = [
+  {en:"Light stretching and mobility work — no max-effort holds today.", ar:"تمدد خفيف وتمارين مرونة — بلاش هولدز بأقصى جهد اليوم."},
+  {en:"Focus on sleep and protein intake. Muscles grow during rest, not training.", ar:"ركّز عالنوم والبروتين. العضل بيكبر وقت الراحة، مش وقت التمرين."},
+  {en:"A short walk or easy cardio is fine — just keep it low intensity.", ar:"مشي خفيف أو كارديو بسيط منيح — بس خليه بشدة واطية."},
+  {en:"Foam roll or massage tight areas (shoulders, wrists, lats).", ar:"فوم رولر أو مساج للمناطق المشدودة (كتف، معصم، ظهر)."},
+  {en:"Full rest is fine too. Listen to your body — soreness is a signal, not a badge.", ar:"راحة كاملة منيحة كمان. اسمع جسمك — الوجع إشارة مش وسام."},
+];
+
+const WEEK_ORDER = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const WEEK_DAY_LABELS = {
+  Sun:{en:"Sun",ar:"أحد"}, Mon:{en:"Mon",ar:"إثنين"}, Tue:{en:"Tue",ar:"ثلاثاء"},
+  Wed:{en:"Wed",ar:"أربعاء"}, Thu:{en:"Thu",ar:"خميس"}, Fri:{en:"Fri",ar:"جمعة"}, Sat:{en:"Sat",ar:"سبت"}
+};
+const REST_LABEL = {en:"Rest & recovery", ar:"راحة واستشفاء"};
+
+function getFullWeek(focus){
+  const trainDays = PLANS[focus];
+  const trainMap = {};
+  trainDays.forEach(d => trainMap[d.day] = d);
+  return WEEK_ORDER.map((day, i) => {
+    const dayLabel = WEEK_DAY_LABELS[day][currentLang];
+    if(trainMap[day]){
+      const d = trainMap[day];
+      return { day: dayLabel, focus: d.focus[currentLang], items: d.items[currentLang], type: "train" };
+    }
+    return { day: dayLabel, focus: REST_LABEL[currentLang], items: [REST_TIPS[i % REST_TIPS.length][currentLang]], type: "rest" };
+  });
+}
+
+const LIBRARY = [
+  {name:"Handstand",
+    tag:{en:"Balance", ar:"توازن"},
+    desc:{en:"Freestanding balance on your hands.", ar:"توازن حر عاليدين بدون إسناد."},
+    steps:{en:[
+      "Wall handstand (chest to wall): face the wall, kick up, hold with your chest near the wall. Build to 60 seconds.",
+      "Wall handstand (back to wall): back facing the wall, walk your feet up until your body is straight. Teaches correct alignment.",
+      "Wall walk-aways: from back-to-wall, lift one hand off briefly, then the other. Builds balance confidence.",
+      "Freestanding kick-ups: kick up to a handstand in open space, catching your balance with small finger and wrist adjustments. Start with a spotter or soft mat.",
+      "Hold and correct: once freestanding, focus on a hollow-body line — ribs down, glutes tight, eyes on the floor."
+    ], ar:[
+      "Handstand عالحيط (صدرك للحيط): واجه الحيط، اركض ورفس لفوق، ثبّت وصدرك قريب من الحيط. وصّل لـ٦٠ ثانية.",
+      "Handstand عالحيط (ضهرك للحيط): ضهرك للحيط، امشِ رجليك لفوق لحد ما جسمك يصير مستقيم. بيعلّمك المحاذاة الصح.",
+      "Wall walk-away: من وضعية ضهرك للحيط، ارفع إيد وحدة لحظة، وبعدين التانية. بيبني ثقة التوازن.",
+      "ركض حر (Freestanding kick-up): اركض لـHandstand بمكان مفتوح، وضبط توازنك بحركات بسيطة بالأصابع والمعصم. ابلش مع حدا يمسكلك أو عمرتبة طرية.",
+      "ثبّت وصحّح: لما توصل حر، ركّز عخط جسم مستقيم — الأضلاع لتحت، المؤخرة مشدودة، عينك عالأرض."
+    ]},
+    mistakes:{en:"Common mistake: over-arching the lower back instead of keeping a straight hollow line. Fix by squeezing the glutes and pushing the floor away through your shoulders.",
+      ar:"الغلطة الشائعة: قوس زيادة بأسفل الضهر بدل خط مستقيم. الحل: اشد المؤخرة وادفع الأرض بكتافك."}},
+  {name:"Front Lever",
+    tag:{en:"Pull strength", ar:"قوة سحب"},
+    desc:{en:"Horizontal body hold, hanging from a bar, back parallel to the floor.", ar:"هولد أفقي معلّق عالبار، ضهرك موازي للأرض."},
+    steps:{en:[
+      "Tuck front lever: hang from the bar, pull your knees to your chest and lean back until your back is flat and parallel to the ground. Hold 3-5 seconds, build to 20+.",
+      "Advanced tuck: same position, but push your hips slightly forward so your thighs are away from your chest.",
+      "Single-leg front lever: extend one leg straight while keeping the other tucked.",
+      "Straddle front lever: extend both legs wide apart (straddle) — easier than legs together because it shortens the lever arm.",
+      "Full front lever: bring the legs together, fully extended, body flat. This is the end goal — expect months of progression."
+    ], ar:[
+      "Tuck Front Lever: تعلّق عالبار، اسحب ركبتيك لصدرك ومِيل لورا لحد ما ضهرك يصير مستوي وموازي للأرض. ثبّت ٣-٥ ثواني، وصّل لـ٢٠+.",
+      "Advanced Tuck: نفس الوضعية، بس ادفع وركك شوي لقدام لحتى فخدك يبعد عن صدرك.",
+      "Front Lever برجل وحدة: مدّ رجل وحدة مستقيمة وخلي التانية Tuck.",
+      "Straddle Front Lever: مدّ الرجلين لبرا (فتحة) — أسهل من الرجلين سوا لأنو بيقصر ذراع الرافعة.",
+      "Full Front Lever: قرّب الرجلين سوا، ممدودة بالكامل، جسمك مستوي. هيدا الهدف النهائي — توقع أشهر من التدرّج."
+    ]},
+    mistakes:{en:"Common mistake: letting the hips sag below the shoulder-to-heel line. Fix by actively pulling your shoulder blades down and back before lifting into position.",
+      ar:"الغلطة الشائعة: تركك الوركين ينزلوا تحت خط الكتف للكعب. الحل: اشد لوح الكتف لتحت ولورا قبل ما تدخل بالوضعية."}},
+  {name:"Planche",
+    tag:{en:"Push strength", ar:"قوة دفع"},
+    desc:{en:"Full-body horizontal hold, supported only by your hands, no feet touching the ground.", ar:"هولد أفقي كامل الجسم، مرتكز عاليدين بس، بدون ما رجليك يلمسوا الأرض."},
+    steps:{en:[
+      "Frog stand / tuck planche prep: place your hands on the floor, lean forward, rest your knees on your elbows, and lift your feet. Build comfort leaning your shoulders past your hands.",
+      "Tuck planche: same as above but knees tucked to chest without resting on elbows — full bodyweight on your hands. Hold 5-10 seconds.",
+      "Advanced tuck planche: push your hips forward slightly so your knees are away from your chest, still tucked.",
+      "Straddle planche: extend both legs wide apart while keeping hips level with shoulders. Straddle is significantly easier than legs-together because of the shorter lever arm.",
+      "Full planche: legs together and fully extended, body dead flat and parallel to the floor. This takes most athletes 1-3+ years of consistent training."
+    ], ar:[
+      "تحضير Frog Stand / Tuck Planche: حط ايديك عالأرض، ميل لقدام، ركّن ركبتيك عمرفقيك، وارفع رجليك. ابني راحة وانت مايل بكتافك أبعد من ايديك.",
+      "Tuck Planche: نفس الوضعية بس ركبتيك لصدرك بدون ما ترتكز عالمرفق — وزن جسمك كامل عاليدين. ثبّت ٥-١٠ ثواني.",
+      "Advanced Tuck Planche: ادفع وركك شوي لقدام لحتى ركبتيك تبعد عن صدرك، لسا Tuck.",
+      "Straddle Planche: مدّ الرجلين لبرا وخلي الوركين بمستوى الكتف. Straddle أسهل بكتير من الرجلين سوا.",
+      "Full Planche: الرجلين سوا وممدودة بالكامل، جسمك مستوي تماماً وموازي للأرض. هيدا بياخد أغلب اللاعبين سنة لـ٣ سنين تدريب مستمر."
+    ]},
+    mistakes:{en:"Common mistake: dropping the hips below shoulder height, which turns it into a low plank instead of a planche. Fix by leaning your shoulders further past your wrists and pushing the floor away hard.",
+      ar:"الغلطة الشائعة: نزول الوركين تحت مستوى الكتف، فبتصير بلانك مش Planche. الحل: ميل كتافك أكتر عن معصمك وادفع الأرض بقوة."}},
+  {name:"Muscle-up",
+    tag:{en:"Dynamic strength", ar:"قوة ديناميك"},
+    desc:{en:"Explosive pull from a hang straight into a support position above the bar — the bridge between pulling and pushing strength.", ar:"سحب انفجاري من التعليق لوضعية دعم فوق البار — الجسر بين قوة السحب والدفع."},
+    steps:{en:[
+      "High pull-ups: pull explosively so your chest reaches bar height, not just your chin. Build power and speed.",
+      "Chest-to-bar with lean: as you pull, lean your chest forward and let your elbows drive back and down, starting the transition path early.",
+      "Band-assisted muscle-up: loop a resistance band around the bar and under your foot or knee to reduce the weight through the hardest part — the transition.",
+      "Negative muscle-up: start in the support position above the bar and lower yourself slowly through the transition and into a hang. Builds control of the exact movement pattern in reverse.",
+      "Full muscle-up: link the pull and the transition into one fluid motion, finishing in a straight-arm support above the bar."
+    ], ar:[
+      "Pull-up عالي: اسحب بانفجار لحتى صدرك يوصل مستوى البار، مش بس ذقنك. ابني قوة وسرعة.",
+      "Chest-to-bar بميلان: وانت عم تسحب، ميل صدرك لقدام وخلي مرفقيك يروحوا لورا وتحت، تبلش مسار الانتقال بدري.",
+      "Muscle-up بمساعدة باند: لف باند مقاومة حوالين البار وتحت رجلك أو ركبتك لتخفف الوزن بأصعب جزء — الانتقال.",
+      "Muscle-up سلبي (Negative): ابلش من وضعية الدعم فوق البار وانزل ببطء عبر الانتقال لحد التعليق. بيبني تحكمك بنفس الحركة بالعكس.",
+      "Muscle-up كامل: اربط السحب والانتقال بحركة واحدة سلسة، خلّص بدعم واستقامة ذراع فوق البار."
+    ]},
+    mistakes:{en:"Common mistake: pulling straight up like a pull-up instead of leaning the chest forward and over the bar. Fix by focusing on driving your chest toward the bar, not your chin toward the ceiling.",
+      ar:"الغلطة الشائعة: تسحب لفوق مباشرة متل Pull-up عادي بدل ميلان صدرك لقدام وفوق البار. الحل: ركّز عدفع صدرك للبار، مش ذقنك للسقف."}},
+  {name:"Human Flag",
+    tag:{en:"Dynamic strength", ar:"قوة ديناميك"},
+    desc:{en:"Full-body horizontal hold gripping a vertical pole or bar.", ar:"هولد أفقي كامل الجسم وانت ماسك عمود عمودي أو بار."},
+    steps:{en:[
+      "Foot-supported flag: grip the pole with both hands (top hand pulling, bottom hand pushing), keep one foot on a low support or the ground, practice the grip and body tension.",
+      "Tuck flag: lift both feet off, knees tucked to chest, body horizontal supported only by your grip. Hold as long as you can.",
+      "Straddle or single-leg flag: extend one or both legs out while maintaining the horizontal line.",
+      "Full flag: body fully extended and straight, held horizontally by grip strength alone."
+    ], ar:[
+      "Flag بدعم رجل: امسك العمود بالإيدين (الإيد الفوقانية تسحب، التحتانية تدفع)، خلي رجل وحدة عدعم واطي أو الأرض، تمرن عالإمساك وشد الجسم.",
+      "Tuck Flag: ارفع الرجلين، الركبتين لصدرك، جسمك أفقي مرتكز بس عالإمساك. ثبّت أطول ما تقدر.",
+      "Straddle أو برجل وحدة: مدّ رجل أو الاثنتين وانت محافظ عالخط الأفقي.",
+      "Flag كامل: جسمك ممدود ومستقيم بالكامل، محمول أفقياً بقوة الإمساك بس."
+    ]},
+    mistakes:{en:"Common mistake: gripping too narrow, which makes the lever harder than it needs to be while learning. Fix by starting with a wider hand spacing, then narrowing it as you get stronger.",
+      ar:"الغلطة الشائعة: مسكة ضيقة زيادة، بتخلي الرافعة أصعب مما لازم وانت عم تتعلم. الحل: ابلش بمسافة أوسع بين ايديك، وضيّقها كل ما تقوى."}},
+];
+
+let auth, db, currentUser = null;
+let fbApi = {};
+
+async function initFirebase(){
+  const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
+  const authMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js");
+  const fsMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAr014V-EU-cZDsLpFoAm4SVu8PsyjK-nc",
+    authDomain: "ironbar-146b3.firebaseapp.com",
+    projectId: "ironbar-146b3",
+    storageBucket: "ironbar-146b3.firebasestorage.app",
+    messagingSenderId: "364524001825",
+    appId: "1:364524001825:web:955afb65624b34c887e160"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  auth = authMod.getAuth(app);
+  db = fsMod.getFirestore(app);
+
+  fbApi = {
+    signUp: (email, pw) => authMod.createUserWithEmailAndPassword(auth, email, pw),
+    logIn: (email, pw) => authMod.signInWithEmailAndPassword(auth, email, pw),
+    logOut: () => authMod.signOut(auth),
+    getUserDoc: async (uid) => {
+      const snap = await fsMod.getDoc(fsMod.doc(db, "users", uid));
+      return snap.exists() ? snap.data() : null;
+    },
+    setUserDoc: async (uid, data) => {
+      await fsMod.setDoc(fsMod.doc(db, "users", uid), data, { merge: true });
+    }
+  };
+
+  authMod.onAuthStateChanged(auth, onAuthChanged);
+}
+
+async function onAuthChanged(user){
+  if(user){
+    currentUser = user;
+    document.getElementById('authWrap').style.display = 'none';
+    let data = null;
+    try{ data = await withTimeout(fbApi.getUserDoc(user.uid), 5000); }catch(e){ /* no doc yet or offline */ }
+    if(data && data.profile){
+      profile = data.profile;
+      logs = data.logs || [];
+      showApp();
+    } else {
+      profile = null; logs = [];
+      document.getElementById('onboardWrap').style.display = 'block';
+    }
+  } else {
+    currentUser = null;
+    profile = null; logs = [];
+    document.getElementById('onboardWrap').style.display = 'none';
+    document.getElementById('appWrap').style.display = 'none';
+    document.getElementById('authWrap').style.display = 'block';
+  }
+}
+
+function withTimeout(promise, ms){
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(()=>reject(new Error('timeout')), ms))
+  ]);
+}
+
+async function loadProfile(){
+  // Handled via onAuthChanged + Firestore; kept as no-op for compatibility.
+}
+
+async function saveProfile(){
+  if(!currentUser) return;
+  try{ await fbApi.setUserDoc(currentUser.uid, { profile }); }catch(e){ /* save failed, continue silently */ }
+}
+async function saveLogs(){
+  if(!currentUser) return;
+  try{ await fbApi.setUserDoc(currentUser.uid, { logs }); }catch(e){ /* save failed, continue silently */ }
+}
+
+function authErr(msg){
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function friendlyAuthError(code){
+  const ar = currentLang === 'ar';
+  if(code.includes('email-already-in-use')) return ar ? "هالإيميل عندو حساب أصلاً. جرب تسجل دخول بدل ما تعمل حساب جديد." : "That email already has an account. Try logging in instead.";
+  if(code.includes('weak-password')) return ar ? "الباسورد لازم يكون ٦ حروف/أرقام عالأقل." : "Password should be at least 6 characters.";
+  if(code.includes('invalid-email')) return ar ? "هالإيميل شكلو مش صحيح." : "That email looks invalid.";
+  if(code.includes('network-request-failed')) return ar ? "ما قدرنا نوصل لخدمة تسجيل الدخول. جرب تبدّل بين الواي فاي وبيانات الموبايل، أو أطفي أي VPN وجرب كمان مرة." : "Couldn't reach the login service. Try switching between Wi-Fi and mobile data, or turn off any VPN and try again.";
+  if(code.includes('too-many-requests')) return ar ? "في محاولات كتير غلط. استنى شوي وجرب من جديد." : "Too many attempts. Wait a bit and try again.";
+  if(code.includes('wrong-password') || code.includes('invalid-credential')) return ar ? "الإيميل أو الباسورد غلط." : "Wrong email or password.";
+  if(code.includes('user-not-found')) return ar ? "ما في حساب بهالإيميل." : "No account found with that email.";
+  return ar ? `صار في مشكلة (${code || 'unknown'}). جرب كمان مرة.` : `Something went wrong (${code || 'unknown'}). Try again.`;
+}
+
+document.getElementById('toggle-pw-btn').addEventListener('click', ()=>{
+  const pwInput = document.getElementById('auth-password');
+  const btn = document.getElementById('toggle-pw-btn');
+  if(pwInput.type === 'password'){
+    pwInput.type = 'text';
+    btn.textContent = currentLang === 'ar' ? 'خبّي' : 'Hide';
+  } else {
+    pwInput.type = 'password';
+    btn.textContent = currentLang === 'ar' ? 'وري' : 'Show';
+  }
+});
+
+document.getElementById('auth-signup-btn').addEventListener('click', async ()=>{
+  const email = document.getElementById('auth-email').value.trim();
+  const pw = document.getElementById('auth-password').value.trim();
+  authErr('');
+  if(!email || !pw){ authErr('Enter an email and password.'); return; }
+  try{
+    await fbApi.signUp(email, pw);
+  }catch(e){ authErr(friendlyAuthError(e.code || '')); }
+});
+
+document.getElementById('auth-login-btn').addEventListener('click', async ()=>{
+  const email = document.getElementById('auth-email').value.trim();
+  const pw = document.getElementById('auth-password').value.trim();
+  authErr('');
+  if(!email || !pw){ authErr('Enter an email and password.'); return; }
+  try{
+    await fbApi.logIn(email, pw);
+  }catch(e){ authErr(friendlyAuthError(e.code || '')); }
+});
+
+document.getElementById('signout-btn').addEventListener('click', async ()=>{
+  try{ await fbApi.logOut(); }catch(e){}
+});
+
+function initOnboard(){
+  let chosenFocus = null, chosenExp = null;
+  document.querySelectorAll('#ob-focus .opt').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      document.querySelectorAll('#ob-focus .opt').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected'); chosenFocus = b.dataset.v;
+      document.getElementById('err-focus').style.display='none';
+    });
+  });
+  document.querySelectorAll('#ob-exp .opt').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      document.querySelectorAll('#ob-exp .opt').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected'); chosenExp = b.dataset.v;
+      document.getElementById('err-exp').style.display='none';
+    });
+  });
+  document.getElementById('ob-submit').addEventListener('click', async ()=>{
+    const name = document.getElementById('ob-name').value.trim();
+    let ok = true;
+    if(!name){ document.getElementById('err-name').style.display='block'; ok=false; } else { document.getElementById('err-name').style.display='none'; }
+    if(!chosenFocus){ document.getElementById('err-focus').style.display='block'; ok=false; }
+    if(!chosenExp){ document.getElementById('err-exp').style.display='block'; ok=false; }
+    if(!ok) return;
+    profile = { name, focus: chosenFocus, experience: chosenExp, createdAt: new Date().toISOString() };
+    showApp();
+    saveProfile();
+  });
+}
+
+function fmtTime(s){
+  const m = Math.floor(s/60).toString().padStart(2,'0');
+  const sec = Math.floor(s%60).toString().padStart(2,'0');
+  return m+":"+sec;
+}
+
+function bestHold(move){
+  const entries = logs.filter(l=>l.move===move);
+  if(entries.length===0) return null;
+  return Math.max(...entries.map(e=>e.seconds));
+}
+
+function computeStreak(){
+  if(logs.length===0) return 0;
+  const days = [...new Set(logs.map(l=>l.date.slice(0,10)))].sort().reverse();
+  let streak = 0;
+  let cursor = new Date();
+  for(let i=0;i<days.length;i++){
+    const d = new Date(days[i]);
+    const diff = Math.round((cursor - d)/86400000);
+    if(diff <= 1){ streak++; cursor = d; } else break;
+  }
+  return streak;
+}
+
+function renderHome(){
+  document.getElementById('home-sub').textContent = profile.focus + " focus — " + profile.experience + " training";
+  document.getElementById('stat-streak').innerHTML = computeStreak() + "<small> days</small>";
+  document.getElementById('stat-count').textContent = logs.length;
+  renderReminder();
+
+  const bh = document.getElementById('best-holds');
+  bh.innerHTML = '';
+  const staticMoves = MOVES;
+  staticMoves.forEach(m=>{
+    const best = bestHold(m);
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `<div><div class="name">${m}</div><div class="meta">${currentLang==='ar'?'أفضل هولد مسجّل':'Best logged hold'}</div></div><div class="val">${best?fmtTime(best):'—'}</div>`;
+    bh.appendChild(row);
+  });
+
+  const week = getFullWeek(profile.focus);
+  const tp = document.getElementById('today-plan');
+  const p = week[new Date().getDay()];
+  const badge = p.type === "rest" ? `<span style="color:var(--steel);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">${currentLang==='ar'?'يوم راحة':'Rest day'}</span>` : '';
+  tp.innerHTML = `<div class="row"><div><div class="name">${p.day} — ${p.focus}</div><div class="meta">${p.items.join(' · ')}</div></div>${badge?`<div>${badge}</div>`:''}</div>`;
+
+  const bl = document.getElementById('badges-list');
+  bl.innerHTML = '';
+  const badgeColors = { Gold:"#D2491C", Silver:"#C9C6BA", Bronze:"#8A5A34" };
+  MOVES.forEach(m=>{
+    const best = bestHold(m);
+    const badge = best ? getBadge(m, best) : null;
+    const t = BADGE_THRESHOLDS[m];
+    const row = document.createElement('div');
+    row.className = 'row';
+    const badgeHtml = badge
+      ? `<span class="badge-new" style="color:${badgeColors[badge]};font-family:'Archivo Black',sans-serif;font-size:13px;">${badge}</span>`
+      : `<span style="color:var(--steel);font-size:12px;">${currentLang==='ar'?`لسا (Bronze عند ${t.bronze} ثانية)`:`Not yet (Bronze at ${t.bronze}s)`}</span>`;
+    row.innerHTML = `<div><div class="name">${m}</div><div class="meta">${currentLang==='ar'?`Bronze ${t.bronze}ث · Silver ${t.silver}ث · Gold ${t.gold}ث`:`Bronze ${t.bronze}s · Silver ${t.silver}s · Gold ${t.gold}s`}</div></div><div class="val">${badgeHtml}</div>`;
+    bl.appendChild(row);
+  });
+}
+
+function renderPlan(){
+  const week = getFullWeek(profile.focus);
+  const el = document.getElementById('plan-list');
+  el.innerHTML = '';
+  week.forEach(p=>{
+    const row = document.createElement('div');
+    row.className = 'row';
+    const tag = p.type === "rest"
+      ? `<span style="color:var(--steel);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">${currentLang==='ar'?'راحة':'Rest'}</span>`
+      : `<span style="color:var(--rust);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">${currentLang==='ar'?'تمرين':'Train'}</span>`;
+    row.innerHTML = `<div><div class="name">${p.day} — ${p.focus}</div><div class="meta">${p.items.join(' · ')}</div></div><div>${tag}</div>`;
+    el.appendChild(row);
+  });
+}
+
+let selectedMove = null, timerSeconds = 0, timerRunning = false, timerInterval = null;
+
+function renderTimerMoves(){
+  const el = document.getElementById('timer-moves');
+  el.innerHTML = '';
+  MOVES.forEach(m=>{
+    const chip = document.createElement('span');
+    chip.className = 'move-chip' + (selectedMove===m?' on':'');
+    chip.textContent = m;
+    chip.addEventListener('click', ()=>{ selectedMove = m; renderTimerMoves(); document.getElementById('timer-move-label').textContent = m; });
+    el.appendChild(chip);
+  });
+}
+
+function tickTimer(){
+  timerSeconds++;
+  document.getElementById('timer-display').textContent = fmtTime(timerSeconds);
+}
+
+document.getElementById('timer-start').addEventListener('click', async ()=>{
+  if(!selectedMove){ document.getElementById('timer-move-label').textContent = 'Pick a move first'; return; }
+  if(!timerRunning){
+    timerRunning = true;
+    document.getElementById('timer-start').textContent = 'Stop & save';
+    timerInterval = setInterval(tickTimer, 1000);
+  } else {
+    timerRunning = false;
+    clearInterval(timerInterval);
+    document.getElementById('timer-start').textContent = 'Start';
+    if(timerSeconds > 0){
+      logs.unshift({move:selectedMove, seconds:timerSeconds, date:new Date().toISOString()});
+      renderLog();
+      renderHome();
+      saveLogs();
+    }
+    timerSeconds = 0;
+    document.getElementById('timer-display').textContent = '00:00';
+  }
+});
+document.getElementById('timer-reset').addEventListener('click', ()=>{
+  timerRunning = false;
+  clearInterval(timerInterval);
+  timerSeconds = 0;
+  document.getElementById('timer-display').textContent = '00:00';
+  document.getElementById('timer-start').textContent = 'Start';
+});
+
+function renderLog(){
+  const el = document.getElementById('log-list');
+  if(logs.length===0){ el.innerHTML = `<div class="empty">${currentLang==='ar'?'ما في جلسات مسجلة بعد. استخدم التايمر تسجل أول هولد.':'No sessions logged yet. Use the timer to save your first hold.'}</div>`; return; }
+  el.innerHTML = '';
+  logs.forEach(l=>{
+    const d = new Date(l.date);
+    const item = document.createElement('div');
+    item.className = 'log-item';
+    item.innerHTML = `<div class="top"><span>${l.move}</span><span>${fmtTime(l.seconds)}</span></div><div class="date">${d.toLocaleDateString()} — ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>`;
+    el.appendChild(item);
+  });
+  renderChart();
+}
+
+function renderChartMoveSelect(){
+  const sel = document.getElementById('chart-move-select');
+  sel.innerHTML = MOVES.map(m=>`<option value="${m}">${m}</option>`).join('');
+  sel.addEventListener('change', renderChart);
+}
+
+function renderChart(){
+  const sel = document.getElementById('chart-move-select');
+  if(!sel) return;
+  const move = sel.value || MOVES[0];
+  const canvas = document.getElementById('progress-chart');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+
+  const entries = logs.filter(l=>l.move===move).slice().reverse();
+  const emptyEl = document.getElementById('chart-empty');
+  if(entries.length===0){
+    emptyEl.style.display = 'block';
+    canvas.style.display = 'none';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  canvas.style.display = 'block';
+
+  const pad = 24;
+  const values = entries.map(e=>e.seconds);
+  const maxV = Math.max(...values, 1);
+  const minV = 0;
+  const stepX = entries.length > 1 ? (w - pad*2) / (entries.length - 1) : 0;
+
+  // grid line
+  ctx.strokeStyle = 'rgba(243,239,228,0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad, h - pad);
+  ctx.lineTo(w - pad, h - pad);
+  ctx.stroke();
+
+  // line path
+  ctx.strokeStyle = '#D2491C';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  entries.forEach((e, i)=>{
+    const x = entries.length > 1 ? pad + i * stepX : w/2;
+    const y = h - pad - ((e.seconds - minV) / (maxV - minV || 1)) * (h - pad*2);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // points
+  ctx.fillStyle = '#F3EFE4';
+  entries.forEach((e, i)=>{
+    const x = entries.length > 1 ? pad + i * stepX : w/2;
+    const y = h - pad - ((e.seconds - minV) / (maxV - minV || 1)) * (h - pad*2);
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  // max label
+  ctx.fillStyle = '#9C9A88';
+  ctx.font = '11px Inter, sans-serif';
+  ctx.fillText(fmtTime(maxV), pad, 14);
+  ctx.fillText(fmtTime(entries[entries.length-1].seconds) + (currentLang==='ar' ? ' آخر رقم' : ' latest'), w - 90, h - pad + 16);
+}
+
+function renderReminder(){
+  const banner = document.getElementById('reminder-banner');
+  const week = getFullWeek(profile.focus);
+  const todayPlan = week[new Date().getDay()];
+  const isTrainDay = todayPlan.type === "train";
+
+  if(!isTrainDay){ banner.style.display = 'none'; return; }
+  if(logs.length===0){
+    banner.style.display = 'block';
+    banner.innerHTML = currentLang === 'ar'
+      ? `<div style="font-size:13px;"><strong style="color:var(--rust);">اليوم يوم تمرين.</strong> <span style="color:var(--steel);">سجّل أول جلسة إلك بتاب التايمر.</span></div>`
+      : `<div style="font-size:13px;"><strong style="color:var(--rust);">Today's a training day.</strong> <span style="color:var(--steel);">Log your first session on the Timer tab.</span></div>`;
+    return;
+  }
+  const last = new Date(logs[0].date);
+  const days = Math.floor((new Date() - last) / 86400000);
+  if(days >= 2){
+    banner.style.display = 'block';
+    banner.innerHTML = currentLang === 'ar'
+      ? `<div style="font-size:13px;"><strong style="color:var(--rust);">آخر تمرين قبل ${days} يوم — واليوم يوم تمرين.</strong> <span style="color:var(--steel);">رجع عالبار.</span></div>`
+      : `<div style="font-size:13px;"><strong style="color:var(--rust);">Last trained ${days} days ago — and today's a training day.</strong> <span style="color:var(--steel);">Get back on the bar.</span></div>`;
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function exportStatsCard(){
+  const canvas = document.createElement('canvas');
+  canvas.width = 900; canvas.height = 1100;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#15140F'; ctx.fillRect(0,0,900,1100);
+  ctx.fillStyle = '#D2491C'; ctx.font = '700 22px Inter, sans-serif';
+  ctx.fillText('IRONBAR ATHLETE CARD', 50, 70);
+  ctx.fillStyle = '#F3EFE4'; ctx.font = '900 46px Inter, sans-serif';
+  ctx.fillText(profile.name, 50, 130);
+  ctx.fillStyle = '#9C9A88'; ctx.font = '16px Inter, sans-serif';
+  ctx.fillText(profile.focus + ' — ' + profile.experience + ' training', 50, 165);
+
+  ctx.strokeStyle = 'rgba(243,239,228,0.15)';
+  ctx.beginPath(); ctx.moveTo(50,195); ctx.lineTo(850,195); ctx.stroke();
+
+  let y = 250;
+  ctx.fillStyle = '#D2491C'; ctx.font = '700 16px Inter, sans-serif';
+  ctx.fillText('BEST HOLDS', 50, y);
+  y += 40;
+  MOVES.forEach(m=>{
+    const best = bestHold(m);
+    const badge = best ? getBadge(m, best) : null;
+    ctx.fillStyle = '#F3EFE4'; ctx.font = '16px Inter, sans-serif';
+    ctx.fillText(m, 50, y);
+    ctx.fillStyle = best ? '#D2491C' : '#565B52'; ctx.font = '700 18px Inter, sans-serif';
+    ctx.fillText(best ? fmtTime(best) + (badge ? '  ('+badge+')' : '') : '—', 550, y);
+    y += 38;
+  });
+
+  y += 20;
+  ctx.strokeStyle = 'rgba(243,239,228,0.15)';
+  ctx.beginPath(); ctx.moveTo(50,y); ctx.lineTo(850,y); ctx.stroke();
+  y += 45;
+  ctx.fillStyle = '#9C9A88'; ctx.font = '13px Inter, sans-serif';
+  ctx.fillText('Total sessions logged: ' + logs.length, 50, y);
+  y += 26;
+  ctx.fillText('Generated ' + new Date().toLocaleDateString(), 50, y);
+
+  const link = document.createElement('a');
+  link.download = (profile.name.replace(/\s+/g,'_')) + '_IronBar_Stats.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+document.getElementById('export-btn').addEventListener('click', exportStatsCard);
+
+function getMoveAnimClass(name){
+  if(/Handstand/i.test(name)) return 'anim-handstand';
+  if(/Front Lever/i.test(name)) return 'anim-lever';
+  if(/Planche/i.test(name)) return 'anim-planche';
+  if(/Human Flag/i.test(name)) return 'anim-flag';
+  if(/Muscle-up/i.test(name)) return 'anim-muscleup';
+  return '';
+}
+
+function getMoveDemoSVG(name){
+  const isTuck = /Tuck/i.test(name);
+  const fingers = (x, y, spread) => `
+    <line x1="${x}" y1="${y}" x2="${x-spread}" y2="${y-6}" class="fig-finger"/>
+    <line x1="${x}" y1="${y}" x2="${x}" y2="${y-7}" class="fig-finger"/>
+    <line x1="${x}" y1="${y}" x2="${x+spread}" y2="${y-6}" class="fig-finger"/>`;
+
+  if(/Handstand/i.test(name)){
+    return `<svg viewBox="0 0 120 130"><g class="fig-group">
+      <line x1="10" y1="112" x2="110" y2="112" stroke="var(--line-strong)" stroke-width="2"/>
+      ${fingers(48,108,7)}${fingers(72,108,7)}
+      <line x1="48" y1="105" x2="48" y2="80" class="fig-line"/>
+      <line x1="72" y1="105" x2="72" y2="80" class="fig-line"/>
+      <line x1="46" y1="82" x2="74" y2="82" class="fig-line"/>
+      <circle cx="60" cy="70" r="10" class="fig-head"/>
+      <line x1="60" y1="80" x2="60" y2="48" class="fig-line"/>
+      <line x1="52" y1="48" x2="68" y2="48" class="fig-line"/>
+      <line x1="55" y1="48" x2="53" y2="14" class="fig-line"/>
+      <line x1="65" y1="48" x2="67" y2="14" class="fig-line"/>
+    </g></svg>`;
+  }
+  if(/Front Lever/i.test(name)){
+    const legEnd = isTuck
+      ? `<path d="M98,36 Q112,20 100,36" class="fig-line"/>`
+      : `<line x1="98" y1="36" x2="122" y2="36" class="fig-line"/>`;
+    return `<svg viewBox="0 0 135 60"><g class="fig-group">
+      <line x1="15" y1="12" x2="110" y2="12" class="fig-bar"/>
+      ${fingers(60,12,7)}
+      <line x1="60" y1="14" x2="56" y2="34" class="fig-line"/>
+      <circle cx="50" cy="34" r="9" class="fig-head"/>
+      <line x1="56" y1="34" x2="98" y2="36" class="fig-line"/>
+      ${legEnd}
+    </g></svg>`;
+  }
+  if(/Planche/i.test(name)){
+    const legEnd = isTuck
+      ? `<path d="M72,70 Q86,55 76,70" class="fig-line"/>`
+      : `<line x1="72" y1="70" x2="108" y2="70" class="fig-line"/>`;
+    return `<svg viewBox="0 0 125 100"><g class="fig-group">
+      <line x1="10" y1="93" x2="115" y2="93" stroke="var(--line-strong)" stroke-width="2"/>
+      ${fingers(30,88,7)}
+      <line x1="30" y1="88" x2="30" y2="70" class="fig-line"/>
+      <circle cx="26" cy="60" r="9" class="fig-head"/>
+      <line x1="30" y1="70" x2="72" y2="70" class="fig-line"/>
+      ${legEnd}
+    </g></svg>`;
+  }
+  if(/Human Flag/i.test(name)){
+    return `<svg viewBox="0 0 135 115"><g class="fig-group">
+      <line x1="20" y1="8" x2="20" y2="110" class="fig-bar"/>
+      ${fingers(20,38,7)}${fingers(20,72,7)}
+      <line x1="20" y1="40" x2="20" y2="70" class="fig-line"/>
+      <circle cx="30" cy="55" r="9" class="fig-head"/>
+      <line x1="20" y1="55" x2="92" y2="57" class="fig-line"/>
+      <line x1="92" y1="57" x2="118" y2="57" class="fig-line"/>
+    </g></svg>`;
+  }
+  if(/Muscle-up/i.test(name)){
+    return `<svg viewBox="0 0 120 105"><g class="fig-group">
+      <line x1="20" y1="58" x2="100" y2="58" class="fig-bar"/>
+      ${fingers(50,58,7)}
+      <line x1="50" y1="58" x2="50" y2="42" class="fig-line"/>
+      <circle cx="50" cy="32" r="10" class="fig-head"/>
+      <line x1="50" y1="42" x2="50" y2="16" class="fig-line"/>
+      <line x1="38" y1="16" x2="62" y2="16" class="fig-line"/>
+    </g></svg>`;
+  }
+  return '';
+}
+
+function renderLibrary(){
+  const el = document.getElementById('lib-list');
+  el.innerHTML = '';
+  const toggleLabel = currentLang === 'ar' ? 'شوف خطوات التدرّج' : 'Show progression steps';
+  const toggleLabelHide = currentLang === 'ar' ? 'اخفي خطوات التدرّج' : 'Hide progression steps';
+  const watchOutLabel = currentLang === 'ar' ? 'انتبه لـ:' : 'Watch out for:';
+  LIBRARY.forEach((m, idx)=>{
+    const item = document.createElement('div');
+    item.className = 'lib-item';
+    const stepsHtml = m.steps[currentLang].map((s,i)=>`<div style="display:flex;gap:10px;margin:10px 0;"><div style="min-width:20px;height:20px;border:1px solid var(--rust);color:var(--rust);border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:600;">${i+1}</div><div style="font-size:13px;color:var(--chalk);line-height:1.5;">${s}</div></div>`).join('');
+    const animClass = getMoveAnimClass(m.name);
+    const demoSvg = getMoveDemoSVG(m.name);
+    const demoHtml = demoSvg ? `<div class="move-demo ${animClass}">${demoSvg}</div>` : '';
+    item.innerHTML = `
+      <div class="lib-head" data-idx="${idx}" style="cursor:pointer;">
+        <div class="tag">${m.tag[currentLang]}</div>
+        <div class="name">${m.name}</div>
+        ${demoHtml}
+        <div class="desc">${m.desc[currentLang]}</div>
+        <div style="font-size:11px;color:var(--rust);margin-top:8px;text-transform:uppercase;letter-spacing:0.06em;" class="lib-toggle">${toggleLabel}</div>
+      </div>
+      <div class="lib-body" id="lib-body-${idx}" style="display:none;margin-top:12px;">
+        ${stepsHtml}
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--steel);line-height:1.5;"><strong style="color:var(--chalk);">${watchOutLabel}</strong> ${m.mistakes[currentLang]}</div>
+      </div>
+    `;
+    el.appendChild(item);
+    item.querySelector('.lib-head').addEventListener('click', (e)=>{
+      if(e.target.closest('.move-demo')) return;
+      const body = document.getElementById('lib-body-'+idx);
+      const toggle = item.querySelector('.lib-toggle');
+      const isOpen = body.style.display === 'block';
+      body.style.display = isOpen ? 'none' : 'block';
+      toggle.textContent = isOpen ? toggleLabel : toggleLabelHide;
+    });
+  });
+}
+
+function switchTab(tab){
+  document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on', b.dataset.tab===tab));
+}
+
+document.querySelectorAll('nav.tabs button').forEach(b=>{
+  b.addEventListener('click', ()=>switchTab(b.dataset.tab));
+});
+
+function showApp(){
+  document.getElementById('onboardWrap').style.display = 'none';
+  document.getElementById('appWrap').style.display = 'block';
+  document.getElementById('hdr-name').textContent = profile.name;
+  renderChartMoveSelect();
+  renderHome();
+  renderPlan();
+  renderTimerMoves();
+  renderLog();
+  renderLibrary();
+  renderReminder();
+  switchTab('home');
+}
+
+(async function init(){
+  applyLanguage(currentLang);
+  initOnboard();
+  try{
+    await withTimeout(initFirebase(), 18000);
+  }catch(e){
+    // Firebase failed to load (blocked, or the connection to Google's servers specifically is failing) —
+    // don't leave the screen blank.
+    document.getElementById('authWrap').style.display = 'block';
+    authErr(currentLang==='ar'
+      ? 'ما قدرنا نوصل لخدمة تسجيل الدخول (مش بالضرورة مشكلة بالواي فاي عندك — ممكن يكون في حجب أو فلترة عالشبكة). جرب تبدّل بين الواي فاي وبيانات الموبايل، أو أطفي أي VPN، وأعد فتح الصفحة.'
+      : "Couldn't reach the login service (this isn't necessarily your Wi-Fi — the network may be blocking or filtering it). Try switching between Wi-Fi and mobile data, or turn off any VPN, then reopen the page.");
+  }
+  // App visibility is otherwise driven by onAuthChanged (auth gate -> onboarding -> app).
+})();
+</script>
+</body>
+</html>
