@@ -1178,5 +1178,49 @@ function showApp(){
   // App visibility is otherwise driven by onAuthChanged (auth gate -> onboarding -> app).
 })();
 </script>
+<button id="coachBtn" style="position:fixed;bottom:16px;right:16px;padding:12px 16px;border:0;border-radius:24px;background:#D2491C;color:#fff;font-weight:600;cursor:pointer;z-index:9999">Coach</button>
+<div id="coachBox" style="display:none;position:fixed;bottom:70px;right:16px;width:min(340px,90vw);background:#1D1C15;color:#F3EFE4;border:1px solid #444;border-radius:12px;padding:12px;z-index:9999">
+  <div id="coachLog" style="max-height:260px;overflow:auto;font-size:14px;margin-bottom:8px"></div>
+  <input id="coachInput" maxlength="500" placeholder="Ask your coach..." style="width:100%;padding:8px;border-radius:8px;border:1px solid #555;background:#252319;color:#F3EFE4">
+  <button id="coachSend" style="margin-top:8px;padding:8px 12px;border:0;border-radius:8px;background:#D2491C;color:#fff;cursor:pointer">Send</button>
+</div>
+<script>
+const COACH_URL = "https://ironbar-coach.mhmdaboudaher.workers.dev";
+const box = document.getElementById("coachBox");
+const log = document.getElementById("coachLog");
+const input = document.getElementById("coachInput");
+const sendBtn = document.getElementById("coachSend");
+document.getElementById("coachBtn").onclick = () => {
+  box.style.display = box.style.display === "none" ? "block" : "none";
+};
+function addLine(who, text) {
+  const p = document.createElement("p");
+  p.textContent = who + ": " + text;
+  p.style.margin = "6px 0";
+  log.appendChild(p);
+  log.scrollTop = log.scrollHeight;
+}
+async function sendMsg() {
+  const message = input.value.trim();
+  if (!message) return;
+  addLine("You", message);
+  input.value = "";
+  sendBtn.disabled = true;
+  try {
+    const res = await fetch(COACH_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
+    });
+    const data = await res.json();
+    addLine("Coach", data.reply || "No reply");
+  } catch (e) {
+    addLine("Coach", "Connection error, try again.");
+  }
+  sendBtn.disabled = false;
+}
+sendBtn.onclick = sendMsg;
+input.onkeydown = (e) => { if (e.key === "Enter") sendMsg(); };
+</script>
 </body>
 </html>
