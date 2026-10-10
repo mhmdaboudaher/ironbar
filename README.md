@@ -9,11 +9,13 @@ A calisthenics training web app with an AI coach.
 
 - Training programs for beginners to advanced
 - AI coach: ask training questions and get short, safe answers
+- Email login
 
 ## Tech Stack
-
+- **Auth:** Firebase Authentication
 - **Frontend:** HTML, CSS, JavaScript, hosted on GitHub Pages
 - **AI coach:** Cloudflare Workers (proxy that keeps the API key secret) and the Groq API (OpenAI gpt-oss-120b)
+
 ## How the AI coach works
 
 ```
